@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: oracle
+  datasource:
+    # Ejemplo: ajusta HOST/SERVICE_NAME y credenciales
+    url: ${DB_URL:jdbc:oracle:thin:@//localhost:1521/ORCLPDB1}
+    username: ${DB_USER:oracle}
+    password: ${DB_PASSWORD:oracle}
+  jpa:
+    # OJO: requiere driver ojdbc en el pom. Este perfil es de referencia.
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ERP
+

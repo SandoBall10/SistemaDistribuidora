@@ -1,0 +1,27 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/DISTRIBUIDORA}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:12345}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: erp
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  error:
+    include-message: never
+
+jwt:
+  secret: ${JWT_SECRET:AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA=}
+  access-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:15}
+  refresh-inactivity-ttl-minutes: ${JWT_REFRESH_INACTIVITY_TTL_MINUTES:30}
+  refresh-absolute-ttl-days: ${JWT_REFRESH_ABSOLUTE_TTL_DAYS:7}
+

@@ -1,0 +1,46 @@
+package com.distribuidora.erp.security.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties(prefix = "jwt")
+public class JwtProperties {
+
+    // Se espera secret en Base64 para trabajar con HMAC SHA.
+    private String secret;
+    private long accessTtlMinutes;
+    private long refreshInactivityTtlMinutes;
+    private long refreshAbsoluteTtlDays;
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public long getAccessTtlMinutes() {
+        return accessTtlMinutes;
+    }
+
+    public void setAccessTtlMinutes(long accessTtlMinutes) {
+        this.accessTtlMinutes = accessTtlMinutes;
+    }
+
+    public long getRefreshInactivityTtlMinutes() {
+        return refreshInactivityTtlMinutes;
+    }
+
+    public void setRefreshInactivityTtlMinutes(long refreshInactivityTtlMinutes) {
+        this.refreshInactivityTtlMinutes = refreshInactivityTtlMinutes;
+    }
+
+    public long getRefreshAbsoluteTtlDays() {
+        return refreshAbsoluteTtlDays;
+    }
+
+    public void setRefreshAbsoluteTtlDays(long refreshAbsoluteTtlDays) {
+        this.refreshAbsoluteTtlDays = refreshAbsoluteTtlDays;
+    }
+}
+

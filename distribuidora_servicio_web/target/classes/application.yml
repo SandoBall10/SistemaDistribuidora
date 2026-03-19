@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: distribuidora-servicio-web
+  profiles:
+    active: dev
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.distribuidora.erp: INFO
+
