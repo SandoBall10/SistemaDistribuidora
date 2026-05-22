@@ -9,4 +9,3 @@ public class DistribuidoraServicioWebApplication {
         SpringApplication.run(DistribuidoraServicioWebApplication.class, args);
     }
 }
-

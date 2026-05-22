@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { loginRequest, refreshRequest } from '../services/authService';
 import { clearSession, getSession, saveSession } from '../services/storage';
 import { setupApiInterceptors } from '../services/http';
+import { extractRoleFromAccessToken } from '../services/jwt';
 import type { AuthSession, LoginPayload } from '../types/auth';
 
 interface AuthContextValue {
@@ -33,7 +34,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const nextSession: AuthSession = {
         ...refreshed,
         empresaId: session.empresaId,
-        nombreUsuario: session.nombreUsuario
+        nombreUsuario: session.nombreUsuario,
+        rol: extractRoleFromAccessToken(refreshed.accessToken)
       };
       setSession(nextSession);
       saveSession(nextSession);
@@ -66,7 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const nextSession: AuthSession = {
       ...response,
       empresaId: payload.empresaId,
-      nombreUsuario: payload.nombreUsuario
+      nombreUsuario: payload.nombreUsuario,
+      rol: extractRoleFromAccessToken(response.accessToken)
     };
     setSession(nextSession);
     saveSession(nextSession);

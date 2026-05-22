@@ -4,6 +4,7 @@ import com.distribuidora.erp.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @Configuration
+@EnableMethodSecurity
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
@@ -27,6 +29,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/externo/**")
+                            .hasAnyAuthority("ROLE_ADMIN", "ROLE_VENDEDOR")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

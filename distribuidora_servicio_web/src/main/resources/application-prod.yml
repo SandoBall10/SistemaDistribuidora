@@ -25,3 +25,8 @@ jwt:
   refresh-inactivity-ttl-minutes: ${JWT_REFRESH_INACTIVITY_TTL_MINUTES:30}
   refresh-absolute-ttl-days: ${JWT_REFRESH_ABSOLUTE_TTL_DAYS:7}
 
+api:
+  peru:
+    token: ${API_PERU_TOKEN:}
+    # base-url: https://api.apis.net.pe
+

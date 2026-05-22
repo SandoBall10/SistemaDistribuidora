@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -54,6 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             Long usuarioId = Long.valueOf(claims.getSubject());
             Long empresaId = Long.valueOf(String.valueOf(claims.get("emp")));
+            String rol = String.valueOf(claims.get("rol"));
 
             // Actualiza el "heartbeat" de actividad para que el refresh por inactividad sea un sliding window.
             // Nota: hacemos best-effort: si falla la persistencia, igual permitimos continuar con la request.
@@ -72,8 +75,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             JwtPrincipal principal = new JwtPrincipal(usuarioId, empresaId);
 
+            java.util.List<GrantedAuthority> authorities = (rol == null || rol.isBlank() || "null".equalsIgnoreCase(rol))
+                    ? java.util.List.of()
+                    : java.util.List.of(new SimpleGrantedAuthority(rol));
+
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(principal, null, java.util.List.of());
+                    new UsernamePasswordAuthenticationToken(principal, null, authorities);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

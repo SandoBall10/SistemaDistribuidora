@@ -31,3 +31,9 @@ jwt:
   refresh-inactivity-ttl-minutes: ${JWT_REFRESH_INACTIVITY_TTL_MINUTES:30}
   refresh-absolute-ttl-days: ${JWT_REFRESH_ABSOLUTE_TTL_DAYS:7}
 
+# Token Bearer para apis.net.pe (consulta RENIEC/SUNAT v2). Preferir API_PERU_TOKEN en entorno.
+api:
+  peru:
+    token: ${API_PERU_TOKEN:sk_15756.w4vTECLJvgLfCWkQbB2c6QgYoyU621OW}
+    # base-url: https://api.apis.net.pe
+

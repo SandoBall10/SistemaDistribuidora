@@ -14,4 +14,5 @@ export interface TokenResponse {
 export interface AuthSession extends TokenResponse {
   empresaId: number;
   nombreUsuario: string;
+  rol: string | null;
 }

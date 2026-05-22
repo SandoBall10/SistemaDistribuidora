@@ -24,6 +24,9 @@ public class Usuario {
     @Column(name = "persona_id", nullable = false)
     private Long personaId;
 
+    @Column(name = "rol_id", nullable = false)
+    private Long rolId;
+
     @Column(name = "nombre_usuario", nullable = false, length = 50)
     private String nombreUsuario;
 
@@ -49,6 +52,10 @@ public class Usuario {
             @JoinColumn(name = "persona_id", referencedColumnName = "id", insertable = false, updatable = false)
     })
     private Persona persona;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rol_id", insertable = false, updatable = false)
+    private Rol rol;
 
     @Column(name = "fecha_creacion", nullable = false)
     private OffsetDateTime fechaCreacion;

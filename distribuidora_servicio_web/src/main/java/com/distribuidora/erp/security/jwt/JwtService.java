@@ -26,13 +26,14 @@ public class JwtService {
         this.signingKey = Keys.hmacShaKeyFor(java.util.Base64.getDecoder().decode(jwtProperties.getSecret()));
     }
 
-    public String generateAccessToken(Long usuarioId, Long empresaId) {
+    public String generateAccessToken(Long usuarioId, Long empresaId, String rol) {
         Instant now = Instant.now();
         Instant exp = now.plus(jwtProperties.getAccessTtlMinutes(), ChronoUnit.MINUTES);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("typ", JwtTokenType.ACCESS.name().toLowerCase());
         claims.put("emp", empresaId);
+        claims.put("rol", rol);
 
         return Jwts.builder()
                 .setClaims(claims)

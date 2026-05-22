@@ -9,8 +9,6 @@ import com.distribuidora.erp.interfaces.dto.auth.TokenResponseDto;
 import com.distribuidora.erp.interfaces.dto.auth.RefreshRequestDto;
 import com.distribuidora.erp.common.exception.BadRequestException;
 import io.jsonwebtoken.Claims;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +20,6 @@ import java.util.UUID;
 
 @Service
 public class AuthService {
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
-
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -60,7 +56,7 @@ public class AuthService {
 
         usuarioRepository.save(usuario);
 
-        String accessToken = jwtService.generateAccessToken(usuario.getId(), usuario.getEmpresaId());
+        String accessToken = jwtService.generateAccessToken(usuario.getId(), usuario.getEmpresaId(), resolveRole(usuario));
 
         return toTokenResponse(accessToken, refreshToken);
     }
@@ -120,7 +116,7 @@ public class AuthService {
         usuario.setLastActivityAt(now);
         usuarioRepository.save(usuario);
 
-        String accessToken = jwtService.generateAccessToken(usuario.getId(), usuario.getEmpresaId());
+        String accessToken = jwtService.generateAccessToken(usuario.getId(), usuario.getEmpresaId(), resolveRole(usuario));
         return toTokenResponse(accessToken, newRefreshToken);
     }
 
@@ -142,6 +138,13 @@ public class AuthService {
             // Nunca debería ocurrir en runtime normal.
             throw new IllegalStateException("No se pudo hashear token", ex);
         }
+    }
+
+    private String resolveRole(Usuario usuario) {
+        if (usuario.getRol() == null || usuario.getRol().getCodigo() == null || usuario.getRol().getCodigo().isBlank()) {
+            throw new BadRequestException("El usuario no tiene rol asignado");
+        }
+        return usuario.getRol().getCodigo();
     }
 }
 

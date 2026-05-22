@@ -1,8 +1,9 @@
-com\distribuidora\erp\interfaces\dto\empresa\EmpresaResponseDto.class
 com\distribuidora\erp\application\service\EmpresaService.class
-com\distribuidora\erp\interfaces\mapper\empresa\EmpresaMapperImpl.class
 com\distribuidora\erp\infrastructure\repository\erp\EmpresaRepository.class
-com\distribuidora\erp\infrastructure\repository\erp\CatalogoUbigeoRepository.class
-com\distribuidora\erp\interfaces\controller\EmpresaController.class
 com\distribuidora\erp\interfaces\dto\empresa\EmpresaCreateDto.class
 com\distribuidora\erp\interfaces\dto\empresa\EmpresaUpdateDto.class
+com\distribuidora\erp\interfaces\dto\empresa\EmpresaResponseDto.class
+com\distribuidora\erp\interfaces\dto\proveedor\TipoDocumentoCatalogoDto.class
+com\distribuidora\erp\infrastructure\repository\erp\ProveedorRepository.class
+com\distribuidora\erp\infrastructure\repository\erp\CatalogoUbigeoRepository.class
+com\distribuidora\erp\interfaces\controller\EmpresaController.class
