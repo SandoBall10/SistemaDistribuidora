@@ -1,4 +1,5 @@
 -- Ventas / Punto de venta — ejecutar si erp.ventas aún no existe en la BD.
+-- Si la tabla ya existe con esquema antiguo, ejecutar migration_fix_esquema_ventas.sql.
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS erp.ventas (
@@ -8,8 +9,8 @@ CREATE TABLE IF NOT EXISTS erp.ventas (
   fecha_emision DATE NOT NULL,
   tipo_comprobante_codigo VARCHAR(20) NOT NULL,
   serie VARCHAR(10) NOT NULL,
-  numero_comprobante VARCHAR(20) NOT NULL,
-  moneda_codigo VARCHAR(6) NOT NULL,
+  numero_comprobante VARCHAR(50) NOT NULL,
+  moneda_codigo VARCHAR(6) NOT NULL DEFAULT 'PEN',
   total_gravado NUMERIC(18,2) NOT NULL CHECK (total_gravado >= 0),
   total_igv NUMERIC(18,2) NOT NULL CHECK (total_igv >= 0),
   total_venta NUMERIC(18,2) NOT NULL CHECK (total_venta >= 0),

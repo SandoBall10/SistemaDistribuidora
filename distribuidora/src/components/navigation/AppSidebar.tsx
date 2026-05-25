@@ -3,6 +3,7 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
 import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
 import PeopleOutlineRoundedIcon from '@mui/icons-material/PeopleOutlineRounded';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
@@ -95,6 +96,12 @@ export function AppSidebar({ open, width, onClose }: AppSidebarProps) {
         {(isAdmin || isVendedor) && (
           <>
             <NavItem to="/ventas" label="Punto de venta" icon={<SellOutlinedIcon />} onNavigate={onClose} />
+            <NavItem
+              to="/ventas/historial"
+              label="Historial ventas"
+              icon={<ReceiptLongRoundedIcon />}
+              onNavigate={onClose}
+            />
             <NavItem to="/clientes" label="Clientes" icon={<PeopleOutlineRoundedIcon />} onNavigate={onClose} />
           </>
         )}

@@ -23,12 +23,15 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isAxiosError } from 'axios';
 import { listClientesActivos } from '../services/clienteService';
+import { listLotesDisponibles } from '../services/loteService';
 import { listProductos } from '../services/productoService';
 import { createVenta } from '../services/ventaService';
 import { extractValidationErrors } from '../services/validation';
 import { ClienteQuickCreateDialog } from '../components/ventas/ClienteQuickCreateDialog';
+import { TicketImpresionDialog } from '../components/ventas/TicketImpresionDialog';
 import { useAuth } from '../hooks/useAuth';
 import type { ClienteResponse } from '../types/cliente';
+import type { LoteDisponible } from '../types/lote';
 import type { ProductoResponse } from '../types/producto';
 
 type CartRow = {
@@ -37,6 +40,8 @@ type CartRow = {
   codigoProducto: string;
   nombreProducto: string;
   loteCodigo: string;
+  lotesOpciones: LoteDisponible[];
+  lotesLoading: boolean;
   cantidad: number;
   precioUnitario: number;
 };
@@ -70,6 +75,17 @@ function fmtMoney(n: number, moneda: string) {
 
 function nextNumeroComprobante() {
   return String(Date.now() % 100_000_000).padStart(8, '0');
+}
+
+function labelLoteOpcion(lote: LoteDisponible) {
+  const stock = Number(lote.stockActual);
+  const stockFmt = Number.isInteger(stock) ? String(stock) : stock.toFixed(2);
+  return `${lote.codigoLote} (Stock: ${stockFmt})`;
+}
+
+function precioCatalogo(prod: ProductoResponse) {
+  const p = prod.precioVenta;
+  return p != null && !Number.isNaN(Number(p)) ? Number(p) : 0;
 }
 
 async function cargarTodosProductos(empresaId: number): Promise<ProductoResponse[]> {
@@ -108,6 +124,7 @@ export function VentaFormPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState('');
   const [clienteModalOpen, setClienteModalOpen] = useState(false);
+  const [ticketVentaId, setTicketVentaId] = useState<number | null>(null);
 
   const onClienteCreado = useCallback((nuevo: ClienteResponse) => {
     setClientes((prev) => {
@@ -156,26 +173,47 @@ export function VentaFormPage() {
     return { totalVenta, totalGravado, totalIgv };
   }, [carrito, lineSubtotal]);
 
-  const agregarProducto = useCallback(
-    (prod: ProductoResponse | null) => {
-      if (!prod) return;
-      const key = crypto.randomUUID();
-      setCarrito((prev) => [
-        ...prev,
-        {
-          key,
-          productoId: prod.id,
-          codigoProducto: prod.codigo,
-          nombreProducto: prod.nombre,
-          loteCodigo: '',
-          cantidad: 1,
-          precioUnitario: 0
-        }
-      ]);
-      setTimeout(() => productSearchRef.current?.focus(), 0);
-    },
-    []
-  );
+  const agregarProducto = useCallback((prod: ProductoResponse | null) => {
+    if (!prod) return;
+    const key = crypto.randomUUID();
+    setCarrito((prev) => [
+      ...prev,
+      {
+        key,
+        productoId: prod.id,
+        codigoProducto: prod.codigo,
+        nombreProducto: prod.nombre,
+        loteCodigo: '',
+        lotesOpciones: [],
+        lotesLoading: true,
+        cantidad: 1,
+        precioUnitario: precioCatalogo(prod)
+      }
+    ]);
+    setTimeout(() => productSearchRef.current?.focus(), 0);
+
+    void (async () => {
+      try {
+        const lotes = await listLotesDisponibles(prod.id);
+        setCarrito((prev) =>
+          prev.map((r) => {
+            if (r.key !== key) return r;
+            const loteCodigo = lotes.length === 1 ? lotes[0].codigoLote : r.loteCodigo;
+            return {
+              ...r,
+              lotesOpciones: lotes,
+              lotesLoading: false,
+              loteCodigo
+            };
+          })
+        );
+      } catch {
+        setCarrito((prev) =>
+          prev.map((r) => (r.key === key ? { ...r, lotesLoading: false } : r))
+        );
+      }
+    })();
+  }, []);
 
   const actualizarFila = useCallback((key: string, patch: Partial<CartRow>) => {
     setCarrito((prev) => prev.map((r) => (r.key === key ? { ...r, ...patch } : r)));
@@ -240,6 +278,7 @@ export function VentaFormPage() {
       setSuccess(
         `Comprobante ${res.serie}-${res.numeroComprobante} emitido (#${res.id}). Stock descontado.`
       );
+      setTicketVentaId(res.id);
       limpiarVenta();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
@@ -451,13 +490,23 @@ export function VentaFormPage() {
                         </TableCell>
                         <TableCell>
                           <TextField
+                            select
                             size="small"
                             value={row.loteCodigo}
                             onChange={(e) => actualizarFila(row.key, { loteCodigo: e.target.value })}
-                            placeholder="Lote"
-                            disabled={submitting}
+                            disabled={submitting || row.lotesLoading}
                             fullWidth
-                          />
+                            SelectProps={{ displayEmpty: true }}
+                          >
+                            <MenuItem value="">
+                              <em>{row.lotesLoading ? 'Cargando…' : 'Seleccione lote'}</em>
+                            </MenuItem>
+                            {row.lotesOpciones.map((lote) => (
+                              <MenuItem key={lote.codigoLote} value={lote.codigoLote}>
+                                {labelLoteOpcion(lote)}
+                              </MenuItem>
+                            ))}
+                          </TextField>
                         </TableCell>
                         <TableCell align="right">
                           <TextField
@@ -584,6 +633,12 @@ export function VentaFormPage() {
         open={clienteModalOpen}
         onClose={() => setClienteModalOpen(false)}
         onCreated={onClienteCreado}
+      />
+
+      <TicketImpresionDialog
+        open={ticketVentaId != null}
+        ventaId={ticketVentaId}
+        onClose={() => setTicketVentaId(null)}
       />
     </Box>
   );

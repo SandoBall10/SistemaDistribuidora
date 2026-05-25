@@ -46,6 +46,7 @@ export function ProductoFormPage() {
   const [claseProductoId, setClaseProductoId] = useState<number | ''>('');
   const [unidadMedidaBaseId, setUnidadMedidaBaseId] = useState<number | ''>('');
   const [tipoIgvId, setTipoIgvId] = useState<number | ''>('');
+  const [precioVentaCatalogo, setPrecioVentaCatalogo] = useState('');
   const [clases, setClases] = useState<CatalogoOption[]>([]);
   const [unidades, setUnidades] = useState<CatalogoOption[]>([]);
   const [tiposIgv, setTiposIgv] = useState<IgvCatalogoItem[]>([]);
@@ -110,6 +111,9 @@ export function ProductoFormPage() {
           if (producto.tipoIgvId != null) {
             setTipoIgvId(producto.tipoIgvId);
           }
+          if (producto.precioVenta != null) {
+            setPrecioVentaCatalogo(String(producto.precioVenta));
+          }
         }
       } catch {
         setError('No se pudo cargar la información del formulario.');
@@ -143,7 +147,8 @@ export function ProductoFormPage() {
           descripcion,
           claseProductoId: Number(claseProductoId),
           unidadMedidaBaseId: Number(unidadMedidaBaseId),
-          tipoIgvId: Number(tipoIgvId)
+          tipoIgvId: Number(tipoIgvId),
+          precioVenta: precioVentaCatalogo.trim() ? Number(precioVentaCatalogo) : 0
         });
       } else {
         await createProducto({
@@ -153,7 +158,8 @@ export function ProductoFormPage() {
           descripcion,
           claseProductoId: Number(claseProductoId),
           unidadMedidaBaseId: Number(unidadMedidaBaseId),
-          tipoIgvId: Number(tipoIgvId)
+          tipoIgvId: Number(tipoIgvId),
+          precioVenta: precioVentaCatalogo.trim() ? Number(precioVentaCatalogo) : 0
         });
       }
       navigate('/inventario/productos', { replace: true });
@@ -256,6 +262,15 @@ export function ProductoFormPage() {
                 </MenuItem>
               ))}
             </TextField>
+            <TextField
+              label="Precio de venta (catálogo)"
+              type="number"
+              value={precioVentaCatalogo}
+              onChange={(e) => setPrecioVentaCatalogo(e.target.value)}
+              error={Boolean(fieldErrors.precioVenta)}
+              helperText={fieldErrors.precioVenta ?? 'Usado en el punto de venta al agregar el producto.'}
+              inputProps={{ min: 0, step: 'any' }}
+            />
 
             <Button type="submit" variant="contained" disabled={isSubmitting}>
               {isSubmitting ? 'Guardando...' : isEdit ? 'Guardar Cambios' : 'Crear Producto'}

@@ -17,3 +17,26 @@ body,
   width: 100%;
   min-height: 100vh;
 }
+
+/* Impresión ticket térmico 80mm — solo el área del comprobante */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .ticket-print-area,
+  .ticket-print-area * {
+    visibility: visible;
+  }
+
+  .ticket-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 !important;
+    padding: 4mm !important;
+    box-shadow: none !important;
+  }
+}

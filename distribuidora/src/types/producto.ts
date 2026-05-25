@@ -17,6 +17,7 @@ export interface ProductoCreatePayload {
   claseProductoId: number;
   unidadMedidaBaseId: number;
   tipoIgvId: number;
+  precioVenta?: number;
 }
 
 export interface ProductoUpdatePayload {
@@ -25,6 +26,7 @@ export interface ProductoUpdatePayload {
   claseProductoId: number;
   unidadMedidaBaseId: number;
   tipoIgvId: number;
+  precioVenta?: number;
 }
 
 export interface ProductoResponse {
@@ -41,6 +43,7 @@ export interface ProductoResponse {
   tipoIgvCodigo?: string | null;
   tipoIgvNombre?: string | null;
   tipoIgvPorcentaje?: number | null;
+  precioVenta?: number | null;
   activo: boolean;
 }
 

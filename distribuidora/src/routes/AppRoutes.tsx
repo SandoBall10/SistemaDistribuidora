@@ -10,6 +10,7 @@ import { ProductosListPage } from '../pages/ProductosListPage';
 import { ProductoFormPage } from '../pages/ProductoFormPage';
 import { CompraFormPage } from '../pages/CompraFormPage';
 import { VentaFormPage } from '../pages/VentaFormPage';
+import { VentasHistorialPage } from '../pages/VentasHistorialPage';
 import { ClientesListPage } from '../pages/ClientesListPage';
 import { ProveedorFormPage } from '../pages/ProveedorFormPage';
 import { ProveedoresListPage } from '../pages/ProveedoresListPage';
@@ -26,6 +27,7 @@ export function AppRoutes() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route element={<PrivateRoute allowedRoles={['ROLE_ADMIN', 'ROLE_VENDEDOR']} />}>
             <Route path="/ventas" element={<VentaFormPage />} />
+            <Route path="/ventas/historial" element={<VentasHistorialPage />} />
             <Route path="/clientes" element={<ClientesListPage />} />
             <Route path="/inventario/productos" element={<ProductosListPage />} />
             <Route path="/inventario/productos/nuevo" element={<ProductoFormPage />} />
