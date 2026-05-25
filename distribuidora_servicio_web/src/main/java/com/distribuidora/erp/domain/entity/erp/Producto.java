@@ -9,11 +9,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -48,6 +52,9 @@ public class Producto {
     @Column(name = "tipo_igv_id", nullable = false)
     private Long tipoIgvId;
 
+    @Column(name = "precio_venta", nullable = false, precision = 18, scale = 4)
+    private BigDecimal precioVenta = BigDecimal.ZERO;
+
     @Column(name = "activo", nullable = false)
     private boolean activo = true;
 
@@ -77,4 +84,13 @@ public class Producto {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_igv_id", referencedColumnName = "id", insertable = false, updatable = false)
     private CatalogoTipoIgv tipoIgv;
+
+    @PostLoad
+    @PrePersist
+    @PreUpdate
+    private void normalizarPrecioVenta() {
+        if (precioVenta == null) {
+            precioVenta = BigDecimal.ZERO;
+        }
+    }
 }

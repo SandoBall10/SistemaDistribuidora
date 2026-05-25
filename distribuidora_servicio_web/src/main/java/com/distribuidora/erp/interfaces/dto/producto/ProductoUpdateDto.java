@@ -1,8 +1,11 @@
 package com.distribuidora.erp.interfaces.dto.producto;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
 
 public class ProductoUpdateDto {
     @NotBlank(message = "El nombre es obligatorio")
@@ -20,6 +23,9 @@ public class ProductoUpdateDto {
     @NotNull(message = "El tipo de afectación IGV es obligatorio")
     private Long tipoIgvId;
 
+    @DecimalMin(value = "0", message = "El precio de venta no puede ser negativo")
+    private BigDecimal precioVenta;
+
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public String getDescripcion() { return descripcion; }
@@ -30,4 +36,6 @@ public class ProductoUpdateDto {
     public void setUnidadMedidaBaseId(Long unidadMedidaBaseId) { this.unidadMedidaBaseId = unidadMedidaBaseId; }
     public Long getTipoIgvId() { return tipoIgvId; }
     public void setTipoIgvId(Long tipoIgvId) { this.tipoIgvId = tipoIgvId; }
+    public BigDecimal getPrecioVenta() { return precioVenta; }
+    public void setPrecioVenta(BigDecimal precioVenta) { this.precioVenta = precioVenta; }
 }

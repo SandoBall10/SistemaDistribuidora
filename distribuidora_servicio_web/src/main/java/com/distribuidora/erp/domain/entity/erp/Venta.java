@@ -82,6 +82,7 @@ public class Venta {
     })
     private Cliente cliente;
 
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    /** Solo PERSIST/REMOVE: nunca MERGE hacia detalle ni catálogo (productos). */
+    @OneToMany(mappedBy = "venta", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<VentaDetalle> detalles = new ArrayList<>();
 }

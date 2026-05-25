@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -96,6 +97,7 @@ public class ProductoService {
         producto.setClaseProductoId(claseProductoId);
         producto.setUnidadMedidaBaseId(unidadMedidaBaseId);
         producto.setTipoIgvId(tipoIgvId);
+        producto.setPrecioVenta(resolverPrecioVenta(dto.getPrecioVenta()));
         producto.setActivo(true);
         producto.setFechaCreacion(now);
         producto.setUsuarioCreacion(usuarioAudit);
@@ -148,6 +150,9 @@ public class ProductoService {
         producto.setClaseProductoId(claseProductoId);
         producto.setUnidadMedidaBaseId(unidadMedidaBaseId);
         producto.setTipoIgvId(tipoIgvId);
+        if (dto.getPrecioVenta() != null) {
+            producto.setPrecioVenta(resolverPrecioVenta(dto.getPrecioVenta()));
+        }
         producto.setFechaModificacion(OffsetDateTime.now());
         producto.setUsuarioModificacion(usuarioAudit);
 
@@ -226,7 +231,12 @@ public class ProductoService {
             dto.setTipoIgvNombre(producto.getTipoIgv().getNombre());
             dto.setTipoIgvPorcentaje(producto.getTipoIgv().getPorcentaje());
         }
+        dto.setPrecioVenta(producto.getPrecioVenta());
         dto.setActivo(producto.isActivo());
         return dto;
+    }
+
+    private static BigDecimal resolverPrecioVenta(BigDecimal raw) {
+        return raw != null && raw.compareTo(BigDecimal.ZERO) >= 0 ? raw : BigDecimal.ZERO;
     }
 }

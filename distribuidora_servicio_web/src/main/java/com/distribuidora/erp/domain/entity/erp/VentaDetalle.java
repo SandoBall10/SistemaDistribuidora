@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.Immutable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -62,6 +63,8 @@ public class VentaDetalle {
     @Column(name = "usuario_modificacion", length = 64)
     private String usuarioModificacion;
 
+    /** Solo lectura en persistencia; la venta usa producto_id, sin actualizar catálogo. */
+    @Immutable
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "empresa_id", referencedColumnName = "empresa_id", insertable = false, updatable = false),

@@ -16,6 +16,7 @@ public class ProductoResponseDto {
     private String tipoIgvCodigo;
     private String tipoIgvNombre;
     private BigDecimal tipoIgvPorcentaje;
+    private BigDecimal precioVenta;
     private boolean activo;
 
     public Long getId() { return id; }
@@ -44,6 +45,8 @@ public class ProductoResponseDto {
     public void setTipoIgvNombre(String tipoIgvNombre) { this.tipoIgvNombre = tipoIgvNombre; }
     public BigDecimal getTipoIgvPorcentaje() { return tipoIgvPorcentaje; }
     public void setTipoIgvPorcentaje(BigDecimal tipoIgvPorcentaje) { this.tipoIgvPorcentaje = tipoIgvPorcentaje; }
+    public BigDecimal getPrecioVenta() { return precioVenta; }
+    public void setPrecioVenta(BigDecimal precioVenta) { this.precioVenta = precioVenta; }
     public boolean isActivo() { return activo; }
     public void setActivo(boolean activo) { this.activo = activo; }
 }

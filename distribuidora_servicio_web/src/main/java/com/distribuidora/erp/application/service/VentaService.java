@@ -2,7 +2,6 @@ package com.distribuidora.erp.application.service;
 
 import com.distribuidora.erp.common.exception.BadRequestException;
 import com.distribuidora.erp.common.exception.NotFoundException;
-import com.distribuidora.erp.domain.entity.erp.Lote;
 import com.distribuidora.erp.domain.entity.erp.Venta;
 import com.distribuidora.erp.domain.entity.erp.VentaDetalle;
 import com.distribuidora.erp.infrastructure.repository.erp.ClienteRepository;
@@ -77,8 +76,9 @@ public class VentaService {
                 throw new BadRequestException("El precio unitario no puede ser negativo");
             }
 
+            String loteCodigo = normalizarCodigoLote(d.getLoteCodigo());
             BigDecimal subtotal = cant.multiply(precio).setScale(2, RoundingMode.HALF_UP);
-            lineas.add(new LineaCalculada(d, cant, precio, d.getLoteCodigo().trim(), subtotal));
+            lineas.add(new LineaCalculada(d, cant, precio, loteCodigo, subtotal));
         }
 
         BigDecimal totalVenta = lineas.stream()
@@ -122,30 +122,53 @@ public class VentaService {
 
         Venta saved = ventaRepository.save(venta);
 
+        Long ventaId = saved.getId();
         for (VentaDetalle line : saved.getDetalles()) {
-            descontarStockLote(empresaId, line);
+            descontarStockLote(empresaId, ventaId, line, usuario, now);
         }
 
         return toResponse(saved);
     }
 
-    private void descontarStockLote(Long empresaId, VentaDetalle line) {
-        String codigo = line.getLoteCodigo().trim();
+    /**
+     * UPDATE directo en erp.lotes (sin cargar {@code Producto} ni hacer merge del catálogo).
+     */
+    private void descontarStockLote(
+            Long empresaId,
+            Long ventaId,
+            VentaDetalle line,
+            String usuario,
+            OffsetDateTime now) {
+        String codigo = normalizarCodigoLote(line.getLoteCodigo());
         BigDecimal salida = line.getCantidad();
+        String referencia = "VTA-" + ventaId;
 
-        Lote lote = loteRepository
-                .findByEmpresaIdAndProductoIdAndCodigoLote(empresaId, line.getProductoId(), codigo)
-                .orElseThrow(() -> new BadRequestException("Stock insuficiente para el lote " + codigo));
+        int updated = loteRepository.descontarStock(
+                empresaId,
+                line.getProductoId(),
+                codigo,
+                salida,
+                referencia,
+                now,
+                usuario);
 
-        BigDecimal actual = lote.getStockActual() != null ? lote.getStockActual() : BigDecimal.ZERO;
-        if (actual.compareTo(salida) < 0) {
+        if (updated == 0) {
+            boolean existe = loteRepository
+                    .findByEmpresaIdAndProductoIdAndCodigoLoteIgnoreCase(
+                            empresaId, line.getProductoId(), codigo)
+                    .isPresent();
+            if (!existe) {
+                throw new BadRequestException("No existe lote " + codigo + " para el producto indicado");
+            }
             throw new BadRequestException("Stock insuficiente para el lote " + codigo);
         }
+    }
 
-        lote.setStockActual(actual.subtract(salida));
-        lote.setReferenciaDocumento("VTA-" + line.getVenta().getId());
-        lote.setFechaModificacion(OffsetDateTime.now());
-        loteRepository.save(lote);
+    private static String normalizarCodigoLote(String raw) {
+        if (!StringUtils.hasText(raw)) {
+            throw new BadRequestException("Código de lote obligatorio");
+        }
+        return raw.trim();
     }
 
     private void validarTotalesEnviados(
