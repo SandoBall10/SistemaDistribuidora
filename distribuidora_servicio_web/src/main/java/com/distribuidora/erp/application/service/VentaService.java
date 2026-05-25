@@ -2,14 +2,19 @@ package com.distribuidora.erp.application.service;
 
 import com.distribuidora.erp.common.exception.BadRequestException;
 import com.distribuidora.erp.common.exception.NotFoundException;
+import com.distribuidora.erp.domain.entity.erp.Cliente;
+import com.distribuidora.erp.domain.entity.erp.Persona;
+import com.distribuidora.erp.domain.entity.erp.Producto;
 import com.distribuidora.erp.domain.entity.erp.Venta;
 import com.distribuidora.erp.domain.entity.erp.VentaDetalle;
 import com.distribuidora.erp.infrastructure.repository.erp.ClienteRepository;
 import com.distribuidora.erp.infrastructure.repository.erp.LoteRepository;
 import com.distribuidora.erp.infrastructure.repository.erp.ProductoRepository;
 import com.distribuidora.erp.infrastructure.repository.erp.VentaRepository;
+import com.distribuidora.erp.interfaces.dto.venta.VentaComprobanteDto;
 import com.distribuidora.erp.interfaces.dto.venta.VentaCreateDto;
 import com.distribuidora.erp.interfaces.dto.venta.VentaDetalleCreateDto;
+import com.distribuidora.erp.interfaces.dto.venta.VentaDetalleResponseDto;
 import com.distribuidora.erp.interfaces.dto.venta.VentaResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,6 +135,27 @@ public class VentaService {
         return toResponse(saved);
     }
 
+    @Transactional(readOnly = true)
+    public VentaComprobanteDto obtenerComprobante(Long empresaId, Long id) {
+        if (id == null) {
+            throw new BadRequestException("El id de venta es obligatorio");
+        }
+        Venta venta = ventaRepository.findComprobanteByIdAndEmpresaId(id, empresaId)
+                .orElseThrow(() -> new NotFoundException("Venta no encontrada: " + id));
+
+        Cliente cliente = clienteRepository.findByEmpresaIdAndId(empresaId, venta.getClienteId())
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado para la venta"));
+
+        return toComprobanteDto(venta, cliente);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VentaResponseDto> listarVentas(Long empresaId) {
+        return ventaRepository.findByEmpresaIdOrderByFechaCreacionDesc(empresaId).stream()
+                .map(VentaService::toResponse)
+                .toList();
+    }
+
     /**
      * UPDATE directo en erp.lotes (sin cargar {@code Producto} ni hacer merge del catálogo).
      */
@@ -211,6 +237,52 @@ public class VentaService {
             throw new BadRequestException("monedaCodigo debe ser PEN o USD");
         }
         return m;
+    }
+
+    private VentaComprobanteDto toComprobanteDto(Venta venta, Cliente cliente) {
+        VentaComprobanteDto dto = new VentaComprobanteDto();
+        dto.setId(venta.getId());
+        dto.setEmpresaId(venta.getEmpresaId());
+        dto.setClienteId(venta.getClienteId());
+        dto.setClienteCodigo(cliente.getCodigoCliente());
+        Persona persona = cliente.getPersona();
+        if (persona != null) {
+            dto.setClienteNombre(persona.getRazonSocialNombre());
+            dto.setClienteNumeroDocumento(persona.getNumeroDocumento());
+        }
+        dto.setFechaEmision(venta.getFechaEmision());
+        dto.setFechaCreacion(venta.getFechaCreacion());
+        dto.setTipoComprobanteCodigo(venta.getTipoComprobanteCodigo());
+        dto.setSerie(venta.getSerie());
+        dto.setNumeroComprobante(venta.getNumeroComprobante());
+        dto.setMonedaCodigo(venta.getMonedaCodigo());
+        dto.setTotalGravado(venta.getTotalGravado());
+        dto.setTotalIgv(venta.getTotalIgv());
+        dto.setTotalVenta(venta.getTotalVenta());
+
+        Long empresaId = venta.getEmpresaId();
+        List<VentaDetalleResponseDto> lineas = new ArrayList<>();
+        for (VentaDetalle det : venta.getDetalles()) {
+            VentaDetalleResponseDto line = new VentaDetalleResponseDto();
+            line.setId(det.getId());
+            line.setProductoId(det.getProductoId());
+            line.setCantidad(det.getCantidad());
+            line.setPrecioUnitario(det.getPrecioUnitario());
+            line.setSubtotal(det.getSubtotal());
+            line.setLoteCodigo(det.getLoteCodigo());
+
+            Producto producto = productoRepository.findById(det.getProductoId()).orElse(null);
+            if (producto != null && empresaId.equals(producto.getEmpresaId())) {
+                line.setProductoCodigo(producto.getCodigo());
+                line.setProductoNombre(producto.getNombre());
+            } else {
+                line.setProductoCodigo("—");
+                line.setProductoNombre("Producto #" + det.getProductoId());
+            }
+            lineas.add(line);
+        }
+        dto.setDetalles(lineas);
+        return dto;
     }
 
     private static VentaResponseDto toResponse(Venta v) {

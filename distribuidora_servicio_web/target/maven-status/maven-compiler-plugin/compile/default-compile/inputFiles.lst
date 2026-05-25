@@ -89,8 +89,10 @@ D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\d
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\usuario\UsuarioCreateDto.java
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\usuario\UsuarioResponseDto.java
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\usuario\UsuarioUpdateDto.java
+D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\venta\VentaComprobanteDto.java
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\venta\VentaCreateDto.java
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\venta\VentaDetalleCreateDto.java
+D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\venta\VentaDetalleResponseDto.java
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\dto\venta\VentaResponseDto.java
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\interfaces\mapper\empresa\EmpresaMapper.java
 D:\Proyectos\SistemaDistribuidora\distribuidora_servicio_web\src\main\java\com\distribuidora\erp\security\config\CorsConfig.java
